@@ -30,7 +30,7 @@ const Nav = () => {
     <nav className={styles.mainNav}>
       <div>
         <div className={styles.container1}>
-          <img className={styles.img} src="memme.jpg" alt="img" />
+        <img className={styles.img} src={`${process.env.PUBLIC_URL}/memme.jpg`} alt="img" />
         </div>
       </div>
       <div>

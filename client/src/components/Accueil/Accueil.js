@@ -330,7 +330,7 @@ const Accueil = ({ isAuthenticated }) => {
         </div>
       </div>
       <div>
-        {/* <MemeList key={memes.length} memes={memes} /> */}
+        <MemeList key={memes.length} memes={memes} />
       </div>
     </div>
   );
