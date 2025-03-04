@@ -84,7 +84,7 @@ const UploadMeme = ({ onUploadSuccess }) => {
 
     try {
       const response = await axios.post(
-        "http://localhost:5000/api/memes",
+        "http://localhost:5000/api/memes/test",
         formData,
         {
           headers: { "Content-Type": "multipart/form-data" },

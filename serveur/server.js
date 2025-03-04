@@ -11,7 +11,7 @@ app.use(cors());
 // app.use("/Convertissuer", require("./routes/Convertissuer"));
 //ROUTE
 app.use("/api", require("./Routes/memeRoutes"));
-
+app.use("/user", require("./Routes/user"));
 
 cloudinary.api
   .ping()

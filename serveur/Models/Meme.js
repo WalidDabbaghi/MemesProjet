@@ -9,6 +9,7 @@ const memeSchema = new mongoose.Schema({
       y: { type: Number, required: true }, // Position Y
     },
   ],
+  user: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: false }, // Référence à l'utilisateur
   createdAt: { type: Date, default: Date.now } // Date de création
 });
 

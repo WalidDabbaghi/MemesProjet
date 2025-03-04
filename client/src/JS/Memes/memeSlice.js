@@ -1,39 +1,117 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 
-// Action pour récupérer les mèmes
-export const fetchMemes = createAsyncThunk("memes/fetchMemes", async () => {
-  const response = await axios.get("http://localhost:5000/api/memes"); // Remplace avec ton URL backend
-  return response.data;
+const BASE_URL = "http://localhost:5000/api/memes";
+//********** Récupérer les mèmes d'un utilisateur spécifique ***********************
+export const getMemesByUserId = createAsyncThunk("memes/getByUserId", async (userId, { rejectWithValue }) => {
+  try {
+      const response = await axios.get(`${BASE_URL}/m/${userId}`);
+      return response.data;
+  } catch (error) {
+      return rejectWithValue(error.response?.data?.message || "Erreur lors de la récupération des mèmes de l'utilisateur");
+  }
+});
+//********** Poster un mème sans authentification ***********************
+export const postMemePublic = createAsyncThunk("memes/postPublic", async (memeData, { rejectWithValue }) => {
+    try {
+        const response = await axios.post(`${BASE_URL}/test`, memeData);
+        return response.data;
+    } catch (error) {
+        return rejectWithValue(error.response?.data?.message || "Erreur lors de l'ajout du mème public");
+    }
 });
 
-const memeSlice = createSlice({
-  name: "memes",
-  initialState: {
-    memes: [],
-    status: "idle",
-    error: null,
-  },
-  reducers: {
-    addMeme: (state, action) => {
-      state.memes.push(action.payload);
+//********** Récupérer les mèmes de l'utilisateur authentifié ***********************
+export const getUserMemes = createAsyncThunk("memes/getUserMemes", async (_, { rejectWithValue }) => {
+    try {
+        const token = localStorage.getItem("token");
+        if (!token) throw new Error("Aucun token trouvé");
+
+        const response = await axios.get(`${BASE_URL}/user`, {
+            headers: { Authorization: `Bearer ${token}` },
+        });
+        return response.data;
+    } catch (error) {
+        return rejectWithValue(error.response?.data?.message || "Erreur lors de la récupération des mèmes de l'utilisateur");
+    }
+});
+
+//********** Poster un mème avec authentification ***********************
+export const postMemeAuth = createAsyncThunk("memes/postAuth", async (memeData, { rejectWithValue }) => {
+    try {
+        const token = localStorage.getItem("token");
+        if (!token) throw new Error("Aucun token trouvé");
+
+        const response = await axios.post(`${BASE_URL}`, memeData, {
+            headers: { Authorization: `Bearer ${token}` },
+        });
+        return response.data;
+    } catch (error) {
+        return rejectWithValue(error.response?.data?.message || "Erreur lors de l'ajout du mème avec authentification");
+    }
+});
+
+export const memeSlice = createSlice({
+    name: "memes",
+    initialState: {
+        memes: [],
+        status: "idle",
+        error: null,
     },
-  },
-  extraReducers: (builder) => {
-    builder
-      .addCase(fetchMemes.pending, (state) => {
-        state.status = "loading";
-      })
-      .addCase(fetchMemes.fulfilled, (state, action) => {
-        state.status = "succeeded";
-        state.memes = action.payload;
-      })
-      .addCase(fetchMemes.rejected, (state, action) => {
-        state.status = "failed";
-        state.error = action.error.message;
-      });
-  },
+    reducers: {},
+    extraReducers: (builder) => {
+        builder
+            //********** Poster un mème sans authentification ***********************
+            .addCase(postMemePublic.pending, (state) => {
+                state.status = "loading";
+            })
+            .addCase(postMemePublic.fulfilled, (state, action) => {
+                state.status = "succeeded";
+                state.memes.push(action.payload);
+            })
+            .addCase(postMemePublic.rejected, (state, action) => {
+                state.status = "failed";
+                state.error = action.payload;
+            })
+
+            //********** Récupérer les mèmes de l'utilisateur authentifié ***********************
+            .addCase(getUserMemes.pending, (state) => {
+                state.status = "loading";
+            })
+            .addCase(getUserMemes.fulfilled, (state, action) => {
+                state.status = "succeeded";
+                state.memes = action.payload;
+            })
+            .addCase(getUserMemes.rejected, (state, action) => {
+                state.status = "failed";
+                state.error = action.payload;
+            })
+ //********** Récupérer les mèmes d'un utilisateur spécifique ***********************
+ .addCase(getMemesByUserId.pending, (state) => {
+  state.status = "loading";
+})
+.addCase(getMemesByUserId.fulfilled, (state, action) => {
+  state.status = "succeeded";
+  state.memes = action.payload;
+})
+.addCase(getMemesByUserId.rejected, (state, action) => {
+  state.status = "failed";
+  state.error = action.payload;
+})
+            //********** Poster un mème avec authentification ***********************
+            .addCase(postMemeAuth.pending, (state) => {
+                state.status = "loading";
+            })
+            .addCase(postMemeAuth.fulfilled, (state, action) => {
+                state.status = "succeeded";
+                state.memes.push(action.payload);
+            })
+            .addCase(postMemeAuth.rejected, (state, action) => {
+                state.status = "failed";
+                state.error = action.payload;
+            });
+    },
 });
 
-export const { addMeme } = memeSlice.actions;
+// Export du reducer
 export default memeSlice.reducer;

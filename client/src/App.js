@@ -1,39 +1,46 @@
-import React, { useState, useEffect } from "react";
-import axios from "axios";
-import UploadMeme from "./components/UploadMeme";
-import MemeList from "./components/MemeList";
+
+import './App.css';
+import { Routes, Route } from 'react-router-dom'
+import Login from "./components/login/Login";
+import Register from "./components/register/Register";
+import Nav from './components/nav/nav';
+import { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { userCurrent } from './JS/userSlice/userSlice';
+import Profil from './components/Account/Profil';
+import PrivateRoute from './Routes/PrivateRoutes';
+import Accueil from './components/Accueil/Accueil';
+import PrivateRoutelogin from './Routes/PrivateRouteLogin';
+
+
 
 function App() {
-  const [memes, setMemes] = useState([]);
-
-  useEffect(() => {
-    fetchMemes();
-  }, []);
-
-  const fetchMemes = async () => {
-    try {
-      const response = await axios.get("http://localhost:5000/api/memes");
-      setMemes(response.data);
-    } catch (error) {
-      console.error("Erreur lors de la récupération des mèmes:", error);
-    }
-  };
-
-  // ✅ 🔥 Ajoute le mème immédiatement après l'upload
-  const handleUploadSuccess = (newMeme) => {
-    setMemes((prevMemes) => {
-      const updatedMemes = [newMeme, ...prevMemes];
-      console.log("Liste des mèmes mise à jour:", updatedMemes);
-      return updatedMemes;
-    });
-  };
+  const { data: user } = useSelector((state) => state.user);
   
 
+
+
+
+
   return (
-    <div>
-      <h1>Générateur de Mèmes</h1>
-      <UploadMeme onUploadSuccess={handleUploadSuccess} />
-      <MemeList key={memes.length} memes={memes} />
+    <div className="App">
+      <Nav />
+      <Routes>
+        <Route path="/" element={<Accueil />} />
+        {/* <Route path="/account/login" element={<Login />} /> */}
+        {/* <Route  element={<PrivateRoutelogin />}> */}
+        <Route path="/account/login" element={<Login />} />
+        {/* </Route>{" "} */}
+        
+        {/* <Route path="/account/signup" element={<Register />} /> */}
+        {/* <Route  element={<PrivateRoutelogin />}> */}
+        <Route path="/account/signup" element={<Register />} />
+        {/* </Route>{" "} */}
+        {/* <Route  element={<PrivateRoute />}> */}
+        {/* <Route path="/account/profile"  element={user ?<Profil />} /> */}
+        <Route path="/account/profile" element={user ? <Profil /> : <p>Veuillez vous connecter</p>} />
+        {/* </Route>{" "} */}
+      </Routes>
     </div>
   );
 }
